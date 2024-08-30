@@ -11,16 +11,16 @@ public class Main {
         TaskManager manager = new TaskManager();
 
         // Создание задач
-        Task task1 = new Task(manager.createTaskId(), "Переезд", "Собрать вещи", Status.NEW);
-        Task task2 = new Task(manager.createTaskId(), "Собрать коробки", "Упаковать вещи", Status.NEW);
+        Task task1 = new Task(0, "Переезд", "Собрать вещи", Status.NEW);
+        Task task2 = new Task(0, "Собрать коробки", "Упаковать вещи", Status.NEW);
 
         // Создание эпиков и подзадач
-        Epic epic1 = new Epic(manager.createTaskId(), "Важный эпик 1", "Описание эпика 1");
-        Subtask subtask1 = new Subtask(manager.createTaskId(), "Задача 1", "Описание задачи 1", Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask(manager.createTaskId(), "Задача 2", "Описание задачи 2", Status.NEW, epic1.getId());
+        Epic epic1 = new Epic(0, "Важный эпик 1", "Описание эпика 1");
+        Subtask subtask1 = new Subtask(0, "Задача 1", "Описание задачи 1", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask(0, "Задача 2", "Описание задачи 2", Status.NEW, epic1.getId());
 
-        Epic epic2 = new Epic(manager.createTaskId(), "Важный эпик 2", "Описание эпика 2");
-        Subtask subtask3 = new Subtask(manager.createTaskId(), "Задача 3", "Описание задачи 3", Status.NEW, epic2.getId());
+        Epic epic2 = new Epic(0, "Важный эпик 2", "Описание эпика 2");
+        Subtask subtask3 = new Subtask(0, "Задача 3", "Описание задачи 3", Status.NEW, epic2.getId());
 
         // Добавление задач и эпиков в менеджер
         manager.addTask(task1);

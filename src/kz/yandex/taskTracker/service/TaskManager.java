@@ -14,17 +14,9 @@ public class TaskManager {
     private Map<Integer, Epic> epics = new HashMap<>();
     private int idCounter = 0;
 
-    // Поля
-    private int generateId() {
-        return ++idCounter;
-    }
-
-    public int createTaskId() {
-        return generateId();
-    }
-
     // Методы для задач
     public void addTask(Task task) {
+        task.setId(generateId());
         tasks.put(task.getId(), task);
     }
 
@@ -46,6 +38,7 @@ public class TaskManager {
 
     // Методы для подзадач
     public void addSubtask(Subtask subtask) {
+        subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
         if (epic != null) {
@@ -62,11 +55,10 @@ public class TaskManager {
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
         if (epic != null) {
-            epic.removeSubtask(subtask.getId());
-            epic.addSubtask(subtask.getId());
             updateEpicStatus(epic);
         }
     }
+
 
     public void removeSubtask(int id) {
         Subtask subtask = subtasks.remove(id);
@@ -89,6 +81,7 @@ public class TaskManager {
 
     // Методы для эпиков
     public void addEpic(Epic epic) {
+        epic.setId(generateId());
         epics.put(epic.getId(), epic);
     }
 
@@ -119,6 +112,11 @@ public class TaskManager {
     }
 
     // Приватные методы
+    // Поля
+    private int generateId() {
+        return ++idCounter;
+    }
+
     private void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) {
             epic.setStatus(Status.NEW);
