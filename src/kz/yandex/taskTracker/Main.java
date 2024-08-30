@@ -1,3 +1,11 @@
+package kz.yandex.taskTracker;
+
+import kz.yandex.taskTracker.service.TaskManager;
+import kz.yandex.taskTracker.model.Epic;
+import kz.yandex.taskTracker.model.Status;
+import kz.yandex.taskTracker.model.Subtask;
+import kz.yandex.taskTracker.model.Task;
+
 public class Main {
     public static void main(String[] args) {
         TaskManager manager = new TaskManager();
@@ -7,11 +15,11 @@ public class Main {
         Task task2 = new Task(manager.generateId(), "Собрать коробки", "Упаковать вещи", Status.NEW);
 
         // Создание эпиков и подзадач
-        Epic epic1 = new Epic(manager.generateId(), "Важный эпик 1", "Описание эпика 1", Status.NEW);
+        Epic epic1 = new Epic(manager.generateId(), "Важный эпик 1", "Описание эпика 1");
         Subtask subtask1 = new Subtask(manager.generateId(), "Задача 1", "Описание задачи 1", Status.NEW, epic1.getId());
         Subtask subtask2 = new Subtask(manager.generateId(), "Задача 2", "Описание задачи 2", Status.NEW, epic1.getId());
 
-        Epic epic2 = new Epic(manager.generateId(), "Важный эпик 2", "Описание эпика 2", Status.NEW);
+        Epic epic2 = new Epic(manager.generateId(), "Важный эпик 2", "Описание эпика 2");
         Subtask subtask3 = new Subtask(manager.generateId(), "Задача 3", "Описание задачи 3", Status.NEW, epic2.getId());
 
         // Добавление задач и эпиков в менеджер
@@ -63,16 +71,16 @@ public class Main {
 
         System.out.println("После удаления:");
         System.out.println("Все задачи:");
-        System.out.println(manager.getTask(task1.getId()));
+        System.out.println(manager.getTask(task1.getId())); // Должно быть null
         System.out.println(manager.getTask(task2.getId()));
 
         System.out.println("Все эпики:");
-        System.out.println(manager.getEpic(epic1.getId()));
+        System.out.println(manager.getEpic(epic1.getId())); // Должно быть null
         System.out.println(manager.getEpic(epic2.getId()));
 
         System.out.println("Все подзадачи:");
-        System.out.println(manager.getSubtask(subtask1.getId()));
-        System.out.println(manager.getSubtask(subtask2.getId()));
+        System.out.println(manager.getSubtask(subtask1.getId())); // Должно быть null
+        System.out.println(manager.getSubtask(subtask2.getId())); // Должно быть null
         System.out.println(manager.getSubtask(subtask3.getId()));
     }
 }

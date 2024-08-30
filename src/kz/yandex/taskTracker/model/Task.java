@@ -1,4 +1,4 @@
-import java.util.Objects;
+package kz.yandex.taskTracker.model;
 
 public class Task {
     private int id;
@@ -65,7 +65,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "kz.yandex.taskTracker.model.Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
