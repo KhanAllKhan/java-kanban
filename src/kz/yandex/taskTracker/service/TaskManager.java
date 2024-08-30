@@ -19,6 +19,10 @@ public class TaskManager {
         return ++idCounter;
     }
 
+    public int createTaskId() {
+        return generateId();
+    }
+
     // Методы для задач
     public void addTask(Task task) {
         tasks.put(task.getId(), task);

@@ -11,16 +11,16 @@ public class Main {
         TaskManager manager = new TaskManager();
 
         // Создание задач
-        Task task1 = new Task(manager.generateId(), "Переезд", "Собрать вещи", Status.NEW);
-        Task task2 = new Task(manager.generateId(), "Собрать коробки", "Упаковать вещи", Status.NEW);
+        Task task1 = new Task(manager.createTaskId(), "Переезд", "Собрать вещи", Status.NEW);
+        Task task2 = new Task(manager.createTaskId(), "Собрать коробки", "Упаковать вещи", Status.NEW);
 
         // Создание эпиков и подзадач
-        Epic epic1 = new Epic(manager.generateId(), "Важный эпик 1", "Описание эпика 1");
-        Subtask subtask1 = new Subtask(manager.generateId(), "Задача 1", "Описание задачи 1", Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask(manager.generateId(), "Задача 2", "Описание задачи 2", Status.NEW, epic1.getId());
+        Epic epic1 = new Epic(manager.createTaskId(), "Важный эпик 1", "Описание эпика 1");
+        Subtask subtask1 = new Subtask(manager.createTaskId(), "Задача 1", "Описание задачи 1", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask(manager.createTaskId(), "Задача 2", "Описание задачи 2", Status.NEW, epic1.getId());
 
-        Epic epic2 = new Epic(manager.generateId(), "Важный эпик 2", "Описание эпика 2");
-        Subtask subtask3 = new Subtask(manager.generateId(), "Задача 3", "Описание задачи 3", Status.NEW, epic2.getId());
+        Epic epic2 = new Epic(manager.createTaskId(), "Важный эпик 2", "Описание эпика 2");
+        Subtask subtask3 = new Subtask(manager.createTaskId(), "Задача 3", "Описание задачи 3", Status.NEW, epic2.getId());
 
         // Добавление задач и эпиков в менеджер
         manager.addTask(task1);
@@ -50,7 +50,6 @@ public class Main {
         manager.updateTask(task1);
         subtask1.setStatus(Status.DONE);
         manager.updateSubtask(subtask1);
-        manager.updateEpicStatus(epic1);
 
         System.out.println("Обновленные задачи:");
         System.out.println(manager.getTask(task1.getId()));
