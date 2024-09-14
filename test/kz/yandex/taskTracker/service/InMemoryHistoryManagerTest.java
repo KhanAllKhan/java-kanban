@@ -53,6 +53,36 @@ class InMemoryTaskManagerTest {
         assertEquals(task.getDescription(), retrievedTask.getDescription());
         assertEquals(task.getStatus(), retrievedTask.getStatus());
     }
+
+    @Test
+    public void testEpicStatusUpdate() {
+        InMemoryTaskManager manager = new InMemoryTaskManager();
+
+        Epic epic = new Epic(1, "Epic 1", "Description 1");
+        manager.addEpic(epic);
+
+        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask(3, "Subtask 2", "Description 2", Status.NEW, epic.getId());
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+
+        // Проверка, что статус эпика обновляется на NEW, если все подзадачи NEW
+        assertEquals(Status.NEW, manager.getEpic(epic.getId()).getStatus());
+
+        // Обновление статуса подзадачи и проверка статуса эпика
+        subtask1.setStatus(Status.IN_PROGRESS);
+        manager.updateSubtask(subtask1);
+        assertEquals(Status.IN_PROGRESS, manager.getEpic(epic.getId()).getStatus());
+
+        // Обновление статуса подзадачи и проверка статуса эпика
+        subtask1.setStatus(Status.DONE);
+        subtask2.setStatus(Status.DONE);
+        manager.updateSubtask(subtask1);
+        manager.updateSubtask(subtask2);
+        assertEquals(Status.DONE, manager.getEpic(epic.getId()).getStatus());
+    }
 }
+
+
 
 
