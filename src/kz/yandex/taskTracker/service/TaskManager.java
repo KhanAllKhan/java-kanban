@@ -4,6 +4,8 @@ import kz.yandex.taskTracker.model.Epic;
 import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Task;
 
+
+import java.util.LinkedList;
 import java.util.List;
 
 public interface TaskManager {
@@ -29,5 +31,5 @@ public interface TaskManager {
     List<Epic> getEpics();
     List<Subtask> getSubtasks();
     List<Subtask> getEpicSubtasks(int epicId);
-    List<Task> getHistory();
+    LinkedList<Task> getHistory();
 }
