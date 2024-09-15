@@ -18,7 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
     private int idCounter = 0;
 
     @Override
-    public LinkedList<Task> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 

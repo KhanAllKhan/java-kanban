@@ -1,7 +1,11 @@
 package kz.yandex.taskTracker.service;
+
 import kz.yandex.taskTracker.model.Task;
-import java.util.LinkedList;
+
+import java.util.List;
+
 public interface HistoryManager {
     void add(Task task);
-    LinkedList<Task> getHistory();
+
+    List<Task> getHistory();
 }
