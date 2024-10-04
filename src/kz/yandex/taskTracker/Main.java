@@ -4,7 +4,6 @@ import kz.yandex.taskTracker.model.Epic;
 import kz.yandex.taskTracker.model.Status;
 import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Task;
-import kz.yandex.taskTracker.service.InMemoryTaskManager;
 import kz.yandex.taskTracker.service.Managers;
 import kz.yandex.taskTracker.service.TaskManager;
 
