@@ -2,7 +2,7 @@ package kz.yandex.taskTracker.service;
 
 import kz.yandex.taskTracker.model.Task;
 
-  class Node {
+class Node {
     Task task;
     Node prev, next;
 
