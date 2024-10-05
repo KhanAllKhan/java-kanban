@@ -13,7 +13,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         if (history.size() < MAX_SIZE_HISTORY) {
             history.add(task);
-        } else {
+        }else {
             history.remove(0);// Удаляем самый старый элемент
         }
 

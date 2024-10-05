@@ -1,88 +1,69 @@
 package kz.yandex.taskTracker.service;
 
 import kz.yandex.taskTracker.model.Task;
-import kz.yandex.taskTracker.model.Epic;
-import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Status;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 class InMemoryHistoryManagerTest {
-    @Test
-    public void testAddAndFindTasksById() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
-
-        Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
-        Epic epic = new Epic(2, "Epic 1", "Description 1");
-        Subtask subtask = new Subtask(3, "Subtask 1", "Description 1", Status.NEW, epic.getId());
-
-        manager.addTask(task);
-        manager.addEpic(epic);
-        manager.addSubtask(subtask);
-
-        assertEquals(task, manager.getTask(task.getId()));
-        assertEquals(epic, manager.getEpic(epic.getId()));
-        assertEquals(subtask, manager.getSubtask(subtask.getId()));
-    }
 
     @Test
-    public void testTaskIdConflict() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+    public void testAddAndRemoveHistory() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
         Task task1 = new Task(1, "Task 1", "Description 1", Status.NEW);
-        Task task2 = new Task(0, "Task 2", "Description 2", Status.NEW);
+        Task task2 = new Task(2, "Task 2", "Description 2", Status.IN_PROGRESS);
 
-        manager.addTask(task1);
-        manager.addTask(task2);
+        historyManager.add(task1);
+        historyManager.add(task2);
 
-        assertEquals(task1, manager.getTask(1));
-        assertNotNull(manager.getTask(task2.getId()));
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task1, history.get(0));
+        assertEquals(task2, history.get(1));
+
+        historyManager.remove(task1.getId());
+        history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task2, history.get(0));
+
+        historyManager.remove(task2.getId());
+        history = historyManager.getHistory();
+        assertTrue(history.isEmpty());
     }
 
     @Test
-    public void testTaskImmutability() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+    public void testDuplicateTaskInHistory() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
-        Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
-        manager.addTask(task);
+        Task task1 = new Task(1, "Task 1", "Description 1", Status.NEW);
+        historyManager.add(task1);
+        historyManager.add(task1); // Добавление той же задачи второй раз
 
-        Task retrievedTask = manager.getTask(task.getId());
-        assertEquals(task, retrievedTask);
-        assertEquals(task.getName(), retrievedTask.getName());
-        assertEquals(task.getDescription(), retrievedTask.getDescription());
-        assertEquals(task.getStatus(), retrievedTask.getStatus());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task1, history.get(0));
     }
 
     @Test
-    public void testEpicStatusUpdate() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+    public void testHistoryOrder() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
-        Epic epic = new Epic(1, "Epic 1", "Description 1");
-        manager.addEpic(epic);
+        Task task1 = new Task(1, "Task 1", "Description 1", Status.NEW);
+        Task task2 = new Task(2, "Task 2", "Description 2", Status.IN_PROGRESS);
+        Task task3 = new Task(3, "Task 3", "Description 3", Status.DONE);
 
-        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, epic.getId());
-        Subtask subtask2 = new Subtask(3, "Subtask 2", "Description 2", Status.NEW, epic.getId());
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
 
-        // Проверка, что статус эпика обновляется на NEW, если все подзадачи NEW
-        assertEquals(Status.NEW, manager.getEpic(epic.getId()).getStatus());
-
-        // Обновление статуса подзадачи и проверка статуса эпика
-        subtask1.setStatus(Status.IN_PROGRESS);
-        manager.updateSubtask(subtask1);
-        assertEquals(Status.IN_PROGRESS, manager.getEpic(epic.getId()).getStatus());
-
-        // Обновление статуса подзадачи и проверка статуса эпика
-        subtask1.setStatus(Status.DONE);
-        subtask2.setStatus(Status.DONE);
-        manager.updateSubtask(subtask1);
-        manager.updateSubtask(subtask2);
-        assertEquals(Status.DONE, manager.getEpic(epic.getId()).getStatus());
+        List<Task> history = historyManager.getHistory();
+        assertEquals(3, history.size());
+        assertEquals(task1, history.get(0));
+        assertEquals(task2, history.get(1));
+        assertEquals(task3, history.get(2));
     }
 }
-
-
-
-

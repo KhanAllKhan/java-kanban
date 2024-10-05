@@ -3,9 +3,6 @@ package kz.yandex.taskTracker.service;
 import kz.yandex.taskTracker.model.Epic;
 import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Task;
-
-
-import java.util.LinkedList;
 import java.util.List;
 
 public interface TaskManager {

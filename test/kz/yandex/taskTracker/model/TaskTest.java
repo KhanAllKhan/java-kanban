@@ -1,5 +1,7 @@
 package kz.yandex.taskTracker.model;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
@@ -10,6 +12,7 @@ class TaskTest {
 
         assertEquals(task1, task2);
     }
+
     @Test
     public void testEpicsEquality() {
         Epic epic1 = new Epic(1, "Epic 1", "Description 1");
