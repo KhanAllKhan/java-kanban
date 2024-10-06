@@ -10,6 +10,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final static int MAX_SIZE_HISTORY = 10;
 
     @Override
+    public void remove(int id) {
+
+    }
+
+    @Override
     public void add(Task task) {
         if (history.size() < MAX_SIZE_HISTORY) {
             history.add(task);
