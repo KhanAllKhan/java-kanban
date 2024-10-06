@@ -11,7 +11,10 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> history = new HashMap<>();
     private final Node head;
     private final Node tail;
-
+    /*
+        Не получилось откатить merge, как я не пытался
+        Придумал написать коммит чтобы создать PR
+         */
     public InMemoryHistoryManager() {
         head = new Node(null);
         tail = new Node(null);
