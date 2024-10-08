@@ -15,24 +15,22 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if (history.containsKey(task.getId())) {
-            remove(task.getId());
-        }
+        remove(task.getId()); // Удаление предыдущей записи, если она существует
         Node newNode = new Node(task);
         if (head == null) {
             head = tail = newNode;
         } else {
             tail.next = newNode;
             newNode.prev = tail;
-            tail = newNode;
+            tail = newNode; // Вынесено за условие
         }
         history.put(task.getId(), newNode);
     }
 
     @Override
     public void remove(int id) {
-        if (history.containsKey(id)) {
-            Node node = history.get(id);
+        Node node = history.remove(id);
+        if (node != null) {
             if (node == head) {
                 head = node.next;
                 if (head != null) {
@@ -49,7 +47,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                 node.prev.next = node.next;
                 node.next.prev = node.prev;
             }
-            history.remove(id);
         }
     }
 

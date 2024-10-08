@@ -56,10 +56,10 @@ public class HistoryManagerTest {
         assertFalse(manager.getEpic(epic.getId()).getSubtaskIds().contains(subtask1.getId()));
     }
 
-    @Test
-    public void testEpicSubtaskIntegrityAfterSubtaskUpdates() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
 
+    @Test
+    public void testRemoveEpicAndRelatedSubtasksFromHistory() {
+        InMemoryTaskManager manager = new InMemoryTaskManager();
         Epic epic = new Epic(1, "Epic 1", "Description 1");
         manager.addEpic(epic);
 
@@ -68,31 +68,26 @@ public class HistoryManagerTest {
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        // Проверка целостности данных после удаления подзадачи
-        manager.removeSubtask(subtask1.getId());
-        assertFalse(manager.getEpic(epic.getId()).getSubtaskIds().contains(subtask1.getId()));
-        assertTrue(manager.getEpic(epic.getId()).getSubtaskIds().contains(subtask2.getId()));
+        // Удаление эпика и проверка удаления подзадач из истории
+        manager.removeEpic(epic.getId());
+
+        List<Task> history = manager.getHistory();
+        assertFalse(history.contains(epic));
+        assertFalse(history.contains(subtask1));
+        assertFalse(history.contains(subtask2));
     }
 
     @Test
-    public void testTaskSettersUpdateManagerData() {
+    public void testRemoveTaskFromHistory() {
         InMemoryTaskManager manager = new InMemoryTaskManager();
-
         Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
         manager.addTask(task);
 
-        // Изменение названия задачи через сеттер и проверка обновленных данных
-        task.setName("Updated Task 1");
-        manager.updateTask(task);
+        // Удаление задачи и проверка удаления из истории
+        manager.removeTask(task.getId());
 
-        Task updatedTask = manager.getTask(task.getId());
-        assertEquals("Updated Task 1", updatedTask.getName());
-
-        // Изменение описания задачи через сеттер и проверка обновленных данных
-        task.setDescription("Updated Description 1");
-        manager.updateTask(task);
-
-        updatedTask = manager.getTask(task.getId());
-        assertEquals("Updated Description 1", updatedTask.getDescription());
+        List<Task> history = manager.getHistory();
+        assertFalse(history.contains(task));
     }
 }
+
