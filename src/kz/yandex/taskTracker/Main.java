@@ -4,12 +4,18 @@ import kz.yandex.taskTracker.model.Epic;
 import kz.yandex.taskTracker.model.Status;
 import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Task;
-import kz.yandex.taskTracker.service.Managers;
+import kz.yandex.taskTracker.service.FileBackedTaskManager;
 import kz.yandex.taskTracker.service.TaskManager;
+
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
+        // Указываем файл для хранения данных
+        File file = new File("tasks.csv");
+
+        // Создаем экземпляр FileBackedTaskManager для работы с файлами
+        TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
 
         // Создание задач
         Task task1 = new Task(0, "Переезд", "Собрать вещи", Status.NEW);
@@ -71,6 +77,9 @@ public class Main {
         System.out.println(taskManager.getSubtask(subtask1.getId())); // Должно быть null
         System.out.println(taskManager.getSubtask(subtask2.getId())); // Должно быть null
         System.out.println(taskManager.getSubtask(subtask3.getId()));
+
+        // После завершения работы программа сохранит все изменения в файл
+        ((FileBackedTaskManager) taskManager).save();
     }
 
     private static void printAllTasks(TaskManager manager) {
