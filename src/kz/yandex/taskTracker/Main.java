@@ -1,108 +1,38 @@
 package kz.yandex.taskTracker;
 
-import kz.yandex.taskTracker.model.Epic;
-import kz.yandex.taskTracker.model.Status;
-import kz.yandex.taskTracker.model.Subtask;
-import kz.yandex.taskTracker.model.Task;
+import kz.yandex.taskTracker.model.*;
 import kz.yandex.taskTracker.service.FileBackedTaskManager;
-import kz.yandex.taskTracker.service.TaskManager;
 
 import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        // Указываем файл для хранения данных
+        // Файл, в котором сохраняются и загружаются задачи
         File file = new File("tasks.csv");
 
-        // Создаем экземпляр FileBackedTaskManager для работы с файлами
-        TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
+        // Загружаем задачи из файла или создаём новый FileBackedTaskManager, если файла нет
+        FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
 
-        // Создание задач
-        Task task1 = new Task(0, "Переезд", "Собрать вещи", Status.NEW);
-        Task task2 = new Task(0, "Собрать коробки", "Упаковать вещи", Status.NEW);
+        // Создаём эпик (без статуса)
+        Epic epic = new Epic(1, "Эпик задача", "Описание эпика");
+        taskManager.addEpic(epic);
 
-        // Создание эпиков и подзадач
-        Epic epic1 = new Epic(0, "Важный эпик 1", "Описание эпика 1");
-        Subtask subtask1 = new Subtask(0, "Задача 1", "Описание задачи 1", Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask(0, "Задача 2", "Описание задачи 2", Status.NEW, epic1.getId());
-
-        Epic epic2 = new Epic(0, "Важный эпик 2", "Описание эпика 2");
-        Subtask subtask3 = new Subtask(0, "Задача 3", "Описание задачи 3", Status.NEW, epic2.getId());
-
-        // Добавление задач и эпиков в менеджер
-        taskManager.addTask(task1);
-        taskManager.addTask(task2);
-        taskManager.addEpic(epic1);
+        // Создаём подзадачу, привязанную к эпику
+        Subtask subtask1 = new Subtask(2, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic.getId());
         taskManager.addSubtask(subtask1);
+
+        // Можно добавить больше подзадач, если нужно
+        Subtask subtask2 = new Subtask(3, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
         taskManager.addSubtask(subtask2);
-        taskManager.addEpic(epic2);
-        taskManager.addSubtask(subtask3);
 
-        // Вызов метода printAllTasks
-        printAllTasks(taskManager);
+        // Создаём простую задачу (не эпик и не подзадачу)
+        Task task = new Task(4, "Обычная задача", "Описание обычной задачи", Status.DONE);
+        taskManager.addTask(task);
 
-        // Обновление статусов и проверка
-        task1.setStatus(Status.IN_PROGRESS);
-        taskManager.updateTask(task1);
-        subtask1.setStatus(Status.DONE);
-        taskManager.updateSubtask(subtask1);
+        // Сохраняем все задачи в файл
+        taskManager.save();
 
-        System.out.println("Обновленные задачи:");
-        System.out.println(taskManager.getTask(task1.getId()));
-        System.out.println(taskManager.getTask(task2.getId()));
-
-        System.out.println("Обновленные эпики:");
-        System.out.println(taskManager.getEpic(epic1.getId()));
-        System.out.println(taskManager.getEpic(epic2.getId()));
-
-        System.out.println("Обновленные подзадачи:");
-        System.out.println(taskManager.getSubtask(subtask1.getId()));
-        System.out.println(taskManager.getSubtask(subtask2.getId()));
-        System.out.println(taskManager.getSubtask(subtask3.getId()));
-
-        // Удаление задач и эпиков
-        taskManager.removeTask(task1.getId());
-        taskManager.removeEpic(epic1.getId());
-
-        System.out.println("После удаления:");
-        System.out.println("Все задачи:");
-        System.out.println(taskManager.getTask(task1.getId())); // Должно быть null
-        System.out.println(taskManager.getTask(task2.getId()));
-
-        System.out.println("Все эпики:");
-        System.out.println(taskManager.getEpic(epic1.getId())); // Должно быть null
-        System.out.println(taskManager.getEpic(epic2.getId()));
-
-        System.out.println("Все подзадачи:");
-        System.out.println(taskManager.getSubtask(subtask1.getId())); // Должно быть null
-        System.out.println(taskManager.getSubtask(subtask2.getId())); // Должно быть null
-        System.out.println(taskManager.getSubtask(subtask3.getId()));
-
-        // После завершения работы программа сохранит все изменения в файл
-        ((FileBackedTaskManager) taskManager).save();
-    }
-
-    private static void printAllTasks(TaskManager manager) {
-        System.out.println("Задачи:");
-        for (Task task : manager.getTasks()) {
-            System.out.println(task);
-        }
-        System.out.println("Эпики:");
-        for (Task epic : manager.getEpics()) {
-            System.out.println(epic);
-
-            for (Task task : manager.getEpicSubtasks(epic.getId())) {
-                System.out.println("--> " + task);
-            }
-        }
-        System.out.println("Подзадачи:");
-        for (Task subtask : manager.getSubtasks()) {
-            System.out.println(subtask);
-        }
-
-        System.out.println("История:");
-        for (Task task : manager.getHistory()) {
-            System.out.println(task);
-        }
+        // Можно добавить вывод для проверки добавленных задач
+        System.out.println("Задачи успешно добавлены и сохранены.");
     }
 }

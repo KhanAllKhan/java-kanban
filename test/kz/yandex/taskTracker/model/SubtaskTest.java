@@ -13,6 +13,6 @@ public class SubtaskTest {
             subtask.setEpicId(1);
         });
 
-        assertEquals("Подзадача не может быть отдельной эпопиком", exception.getMessage());
+        assertEquals("Подзадача не может быть своей собственной эпопиком", exception.getMessage());
     }
 }
