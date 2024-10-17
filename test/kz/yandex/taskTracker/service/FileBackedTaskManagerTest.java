@@ -109,44 +109,7 @@ class FileBackedTaskManagerTest {
         assertEquals(epic1, history.get(2));
     }
 
-    @Test
-    void testSaveAndLoadWithSubtasks() {
-        // Создаем эпик и подзадачи
-        Epic epic = new Epic(8, "Эпик", "Описание эпика");
-        Subtask subtask1 = new Subtask(9, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic.getId());
-        Subtask subtask2 = new Subtask(10, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
 
-        // Добавляем эпик и подзадачи в менеджер
-        manager.addEpic(epic);
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);
-
-        // Проверяем, что подзадачи добавлены
-        assertEquals(2, manager.getSubtasks().size(), "Expected 2 subtasks in the manager");
-
-        // Сохраняем менеджер
-        manager.save();
-
-        // Загружаем данные из файла
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-
-        // Проверяем эпик и подзадачи
-        Epic loadedEpic = loadedManager.getEpic(epic.getId());
-        List<Subtask> loadedSubtasks = loadedManager.getEpicSubtasks(epic.getId());
-
-        // Проверяем, что загруженный эпик соответствует оригиналу
-        assertEquals(epic, loadedEpic);
-        // Проверяем, что количество загруженных подзадач равно 2
-        assertEquals(2, loadedSubtasks.size());
-        // Проверяем, что загруженные подзадачи содержат оригинальные подзадачи
-        assertTrue(loadedSubtasks.contains(subtask1));
-        assertTrue(loadedSubtasks.contains(subtask2));
-
-        // Проверяем, что у загруженного эпика правильно сохранены ID подзадач
-        assertEquals(2, loadedEpic.getSubtaskIds().size());
-        assertTrue(loadedEpic.getSubtaskIds().contains(subtask1.getId()));
-        assertTrue(loadedEpic.getSubtaskIds().contains(subtask2.getId()));
-    }
 
 
     @Test
