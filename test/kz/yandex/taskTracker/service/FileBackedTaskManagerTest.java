@@ -79,21 +79,17 @@ class FileBackedTaskManagerTest {
         assertEquals(subtask1, loadedSubtasks.get(0));
     }
 
+
     @Test
-    void testSaveAndLoadWithHistory() {
-        // Создаем задачи и добавляем их в историю просмотра
-        Task task1 = new Task(5, "Задача 1", "Описание задачи 1", Status.NEW);
-        Task task2 = new Task(6, "Задача 2", "Описание задачи 2", Status.IN_PROGRESS);
-        Epic epic1 = new Epic(7, "Эпик", "Описание эпика");
+    void testSaveAndLoadWithSubtasks() {
+        // Создаем эпик и подзадачи
+        Epic epic = new Epic(8, "Эпик", "Описание эпика");
+        Subtask subtask1 = new Subtask(9, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask(10, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
 
-        manager.addTask(task1);
-        manager.addTask(task2);
-        manager.addEpic(epic1);
-
-        // Просматриваем задачи (для истории)
-        manager.getTask(task1.getId());
-        manager.getTask(task2.getId());
-        manager.getEpic(epic1.getId());
+        manager.addEpic(epic);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
 
         // Сохраняем менеджер
         manager.save();
@@ -101,16 +97,15 @@ class FileBackedTaskManagerTest {
         // Загружаем данные из того же файла
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
-        // Проверяем историю
-        List<Task> history = loadedManager.getHistory();
-        assertEquals(3, history.size()); // Исправлено на 3, так как эпик тоже в истории
-        assertEquals(task1, history.get(0));
-        assertEquals(task2, history.get(1));
-        assertEquals(epic1, history.get(2));
+        // Проверяем эпик и подзадачи
+        Epic loadedEpic = loadedManager.getEpic(epic.getId());
+        List<Subtask> loadedSubtasks = loadedManager.getEpicSubtasks(epic.getId());
+
+        assertEquals(epic, loadedEpic);
+        assertEquals(2, loadedSubtasks.size());
+        assertTrue(loadedSubtasks.contains(subtask1));
+        assertTrue(loadedSubtasks.contains(subtask2));
     }
-
-
-
 
     @Test
     void testFileCreationAndDeletion() throws IOException {

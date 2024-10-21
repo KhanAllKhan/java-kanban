@@ -1,4 +1,4 @@
-package kz.yandex.taskTracker;
+
 
 import kz.yandex.taskTracker.model.*;
 import kz.yandex.taskTracker.service.FileBackedTaskManager;
@@ -29,10 +29,19 @@ public class Main {
         Task task = new Task(4, "Обычная задача", "Описание обычной задачи", Status.DONE);
         taskManager.addTask(task);
 
-        // Сохраняем все задачи в файл
-        taskManager.save();
+        // Загружаем задачи из файла для проверки
+        FileBackedTaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(file);
 
-        // Можно добавить вывод для проверки добавленных задач
-        System.out.println("Задачи успешно добавлены и сохранены.");
+        // Выводим загруженные задачи для проверки
+        System.out.println("Загруженные задачи:");
+        for (Task loadedTask : loadedTaskManager.getTasks()) {
+            System.out.println(loadedTask);
+        }
+        for (Epic loadedEpic : loadedTaskManager.getEpics()) {
+            System.out.println(loadedEpic);
+        }
+        for (Subtask loadedSubtask : loadedTaskManager.getSubtasks()) {
+            System.out.println(loadedSubtask);
+        }
     }
 }

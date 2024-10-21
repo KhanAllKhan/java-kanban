@@ -1,9 +1,6 @@
 package kz.yandex.taskTracker.service;
 
-import kz.yandex.taskTracker.model.Epic;
-import kz.yandex.taskTracker.model.Status;
-import kz.yandex.taskTracker.model.Subtask;
-import kz.yandex.taskTracker.model.Task;
+import kz.yandex.taskTracker.model.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,9 +8,9 @@ import java.util.Map;
 import java.util.ArrayList;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
+    protected final Map<Integer, Task> tasks = new HashMap<>();
+    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private int idCounter = 0;
 
@@ -192,11 +189,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Приватные методы
-    private int generateId() {
+    protected int generateId() {
         return ++idCounter;
     }
 
-    private void updateEpicStatus(Epic epic) {
+    protected void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) {
             epic.setStatus(Status.NEW);
             return;

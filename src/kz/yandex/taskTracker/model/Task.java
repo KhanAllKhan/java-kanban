@@ -55,33 +55,27 @@ public class Task {
 
     public static Task fromString(String value) {
         String[] fields = value.split(",");
-
-        // Убедимся, что в массиве достаточно полей
-        if (fields.length < 4) {
-            throw new IllegalArgumentException("Invalid input string: " + value);
-        }
-
-        int id = Integer.parseInt(fields[0].trim());
-        TaskType type = TaskType.valueOf(fields[1].trim().toUpperCase()); // Приводим к верхнему регистру
-        String name = fields[2].trim();
-        Status status = Status.valueOf(fields[3].trim().toUpperCase()); // Приводим к верхнему регистру
-        String description = fields.length > 4 ? fields[4].trim() : ""; // Если описание не передано, устанавливаем пустую строку
+        int id = Integer.parseInt(fields[0]);
+        TaskType type = TaskType.valueOf(fields[1]);
+        String name = fields[2];
+        Status status = Status.valueOf(fields[3]);
+        String description = fields[4];
 
         switch (type) {
             case TASK:
                 return new Task(id, name, description, status);
             case EPIC:
-                return new Epic(id, name, description);
+                Epic epic = new Epic(id, name, description);
+                epic.setStatus(status); // Устанавливаем статус эпика
+                return epic;
             case SUBTASK:
-                if (fields.length < 6) { // Проверяем, что есть epicId
-                    throw new IllegalArgumentException("Subtask requires epicId: " + value);
-                }
-                int epicId = Integer.parseInt(fields[5].trim()); // Извлекаем epicId из шестого поля
+                int epicId = Integer.parseInt(fields[5]);
                 return new Subtask(id, name, description, status, epicId);
             default:
                 throw new IllegalArgumentException("Unknown task type: " + type);
         }
     }
+
 
     @Override
     public boolean equals(Object o) {
