@@ -4,7 +4,6 @@ import kz.yandex.taskTracker.model.*;
 
 import java.io.*;
 
-
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final String HEADER = "id,type,name,status,description,epic\n";
     private final File file;
@@ -49,6 +48,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (epic != null) {
             epic.addSubtask(subtask.getId());
             updateEpicStatus(epic);
+        } else {
+            throw new IllegalArgumentException("Epic not found for subtask: " + subtask.getId());
         }
         save();
     }
@@ -67,12 +68,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
+        super.updateSubtask(subtask); // Вызов метода класса-родителя
         Epic epic = epics.get(subtask.getEpicId());
         if (epic != null) {
-            updateEpicStatus(epic);
+            updateEpicStatus(epic); // Обновление статуса эпика
+            save(); // Сохранение нового состояния эпика
+        } else {
+            throw new IllegalArgumentException("Epic not found for subtask: " + subtask.getId());
         }
-        save();
     }
 
     @Override
@@ -122,16 +125,45 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case SUBTASK:
                         Subtask subtask = (Subtask) task;
                         manager.subtasks.put(subtask.getId(), subtask);
-                        Epic parentEpic = manager.epics.get(subtask.getEpicId());
-                        if (parentEpic != null) {
-                            parentEpic.addSubtask(subtask.getId());
-                        }
                         break;
                 }
             }
+            manager.initializeEpicSubtasks();
+            manager.updateIdCounter();
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка загрузки задачи", e);
         }
         return manager;
+    }
+
+    private void initializeEpicSubtasks() {
+        for (Epic epic : epics.values()) {
+            for (Integer subtaskId : epic.getSubtaskIds()) {
+                Subtask subtask = subtasks.get(subtaskId);
+                if (subtask != null) {
+                    epic.addSubtask(subtaskId);
+                }
+            }
+        }
+    }
+
+    private void updateIdCounter() {
+        int maxId = 0;
+        for (Task task : tasks.values()) {
+            if (task.getId() > maxId) {
+                maxId = task.getId();
+            }
+        }
+        for (Epic epic : epics.values()) {
+            if (epic.getId() > maxId) {
+                maxId = epic.getId();
+            }
+        }
+        for (Subtask subtask : subtasks.values()) {
+            if (subtask.getId() > maxId) {
+                maxId = subtask.getId();
+            }
+        }
+        setIdCounter(maxId);
     }
 }

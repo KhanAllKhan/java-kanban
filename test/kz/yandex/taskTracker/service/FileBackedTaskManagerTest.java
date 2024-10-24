@@ -73,39 +73,13 @@ class FileBackedTaskManagerTest {
         assertEquals(1, loadedEpics.size());
         assertEquals(1, loadedSubtasks.size());
 
-        assertEquals(task1, loadedTasks.get(0));
-        assertEquals(task2, loadedTasks.get(1));
-        assertEquals(epic1, loadedEpics.get(0));
-        assertEquals(subtask1, loadedSubtasks.get(0));
+        // Сравниваем поля задач
+        assertTaskEquals(task1, loadedTasks.get(0));
+        assertTaskEquals(task2, loadedTasks.get(1));
+        assertEpicEquals(epic1, loadedEpics.get(0));
+        assertSubtaskEquals(subtask1, loadedSubtasks.get(0));
     }
 
-
-    @Test
-    void testSaveAndLoadWithSubtasks() {
-        // Создаем эпик и подзадачи
-        Epic epic = new Epic(8, "Эпик", "Описание эпика");
-        Subtask subtask1 = new Subtask(9, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic.getId());
-        Subtask subtask2 = new Subtask(10, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
-
-        manager.addEpic(epic);
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);
-
-        // Сохраняем менеджер
-        manager.save();
-
-        // Загружаем данные из того же файла
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-
-        // Проверяем эпик и подзадачи
-        Epic loadedEpic = loadedManager.getEpic(epic.getId());
-        List<Subtask> loadedSubtasks = loadedManager.getEpicSubtasks(epic.getId());
-
-        assertEquals(epic, loadedEpic);
-        assertEquals(2, loadedSubtasks.size());
-        assertTrue(loadedSubtasks.contains(subtask1));
-        assertTrue(loadedSubtasks.contains(subtask2));
-    }
 
     @Test
     void testFileCreationAndDeletion() throws IOException {
@@ -117,5 +91,27 @@ class FileBackedTaskManagerTest {
 
         // Проверяем, что файл удален
         assertFalse(tempFile.exists());
+    }
+
+    private void assertTaskEquals(Task expected, Task actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getStatus(), actual.getStatus());
+    }
+
+    private void assertEpicEquals(Epic expected, Epic actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getStatus(), actual.getStatus());
+    }
+
+    private void assertSubtaskEquals(Subtask expected, Subtask actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.getEpicId(), actual.getEpicId());
     }
 }

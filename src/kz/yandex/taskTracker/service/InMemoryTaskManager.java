@@ -222,4 +222,13 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.IN_PROGRESS);
         }
     }
+
+    // Новые методы для доступа к idCounter
+    protected int getIdCounter() {
+        return idCounter;
+    }
+
+    protected void setIdCounter(int idCounter) {
+        this.idCounter = idCounter;
+    }
 }
