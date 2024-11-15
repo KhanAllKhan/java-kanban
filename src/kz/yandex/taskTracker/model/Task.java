@@ -28,6 +28,7 @@ public class Task {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -39,6 +40,7 @@ public class Task {
     public Status getStatus() {
         return status;
     }
+
     public void setStatus(Status status) {
         this.status = status;
     }
@@ -46,6 +48,7 @@ public class Task {
     public TaskType getType() {
         return TaskType.TASK;
     }
+
     public static Task fromString(String line) {
         String[] parts = line.split(",");
         int id = Integer.parseInt(parts[0]);
