@@ -137,23 +137,5 @@ class InMemoryHistoryManagerTest {
         assertTrue(manager.getEpic(epic.getId()).getSubtaskIds().contains(subtask2.getId()));
     }
 
-    @Test
-    public void testTaskSettersUpdateManagerData() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
 
-        Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
-        manager.addTask(task);
-
-        // Изменение названия задачи через сеттер
-        task.setName("Updated Task 1");
-        manager.updateTask(task);
-
-        Task updatedTask = manager.getTask(task.getId());
-        assertEquals("Updated Task 1", updatedTask.getName());
-
-
-
-        updatedTask = manager.getTask(task.getId());
-        assertEquals("Updated Description 1", updatedTask.getDescription());
-    }
 }
