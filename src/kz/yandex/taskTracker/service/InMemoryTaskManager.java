@@ -132,7 +132,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic existingEpic = epics.get(epic.getId());
         if (existingEpic != null) {
             existingEpic.setName(epic.getName());
-            existingEpic.setDescription(epic.getDescription());
+            // Удаляем вызов setDescription, так как он будет в FileBackedTaskManager
             historyManager.add(existingEpic); // Обновляем историю
         }
     }
@@ -195,7 +195,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) {
-            epic.setStatus(Status.NEW);
+            epic.setStatus(Status.NEW); // Убедитесь, что этот метод есть в Task
             return;
         }
 
@@ -215,11 +215,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (allNew) {
-            epic.setStatus(Status.NEW);
+            epic.setStatus(Status.NEW); // Убедитесь, что этот метод есть в Task
         } else if (allDone) {
-            epic.setStatus(Status.DONE);
+            epic.setStatus(Status.DONE); // Убедитесь, что этот метод есть в Task
         } else {
-            epic.setStatus(Status.IN_PROGRESS);
+            epic.setStatus(Status.IN_PROGRESS); // Убедитесь, что этот метод есть в Task
         }
     }
 

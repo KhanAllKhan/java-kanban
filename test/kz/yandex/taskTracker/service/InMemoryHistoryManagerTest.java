@@ -151,9 +151,7 @@ class InMemoryHistoryManagerTest {
         Task updatedTask = manager.getTask(task.getId());
         assertEquals("Updated Task 1", updatedTask.getName());
 
-        // Изменение описания задачи через сеттер
-        task.setDescription("Updated Description 1");
-        manager.updateTask(task);
+
 
         updatedTask = manager.getTask(task.getId());
         assertEquals("Updated Description 1", updatedTask.getDescription());

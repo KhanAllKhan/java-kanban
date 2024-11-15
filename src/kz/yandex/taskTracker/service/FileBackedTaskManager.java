@@ -29,6 +29,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+    public void updateTaskDescription(int taskId, String newDescription) {
+        Task task = tasks.get(taskId);
+        if (task != null) {
+            // Создаем новую задачу с обновленным описанием
+            Task updatedTask = new Task(task.getId(), task.getName(), newDescription, task.getStatus());
+            tasks.put(taskId, updatedTask);
+            save(); // Сохраняем изменения
+        } else {
+            throw new IllegalArgumentException("Task not found: " + taskId);
+        }
+    }
+
     @Override
     public void addTask(Task task) {
         tasks.put(task.getId(), task);
@@ -68,14 +80,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        super.updateSubtask(subtask); // Вызов метода класса-родителя
-        Epic epic = epics.get(subtask.getEpicId());
-        if (epic != null) {
-            updateEpicStatus(epic); // Обновление статуса эпика
-            save(); // Сохранение нового состояния эпика
-        } else {
-            throw new IllegalArgumentException("Epic not found for subtask: " + subtask.getId());
-        }
+     subtasks.put(subtask.getId(),subtask);
+     save();
     }
 
     @Override

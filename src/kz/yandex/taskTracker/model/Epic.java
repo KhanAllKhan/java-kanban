@@ -28,6 +28,16 @@ public class Epic extends Task {
         subtaskIds.remove((Integer) subtaskId);
     }
 
+    // Добавляем метод setName
+    public void setName(String name) {
+        super.setName(name); // Устанавливаем имя через метод родителя
+    }
+
+    // Добавляем метод setStatus
+    public void setStatus(Status status) {
+        super.setStatus(status); // Устанавливаем статус через метод родителя
+    }
+
     @Override
     public TaskType getType() {
         return TaskType.EPIC;

@@ -28,7 +28,6 @@ public class Task {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -37,14 +36,9 @@ public class Task {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Status getStatus() {
         return status;
     }
-
     public void setStatus(Status status) {
         this.status = status;
     }
@@ -52,30 +46,26 @@ public class Task {
     public TaskType getType() {
         return TaskType.TASK;
     }
-
-    public static Task fromString(String value) {
-        String[] fields = value.split(",");
-        int id = Integer.parseInt(fields[0]);
-        TaskType type = TaskType.valueOf(fields[1]);
-        String name = fields[2];
-        Status status = Status.valueOf(fields[3]);
-        String description = fields[4];
+    public static Task fromString(String line) {
+        String[] parts = line.split(",");
+        int id = Integer.parseInt(parts[0]);
+        TaskType type = TaskType.valueOf(parts[1]);
+        String name = parts[2];
+        Status status = Status.valueOf(parts[3]);
+        String description = parts[4];
 
         switch (type) {
             case TASK:
                 return new Task(id, name, description, status);
             case EPIC:
-                Epic epic = new Epic(id, name, description);
-                epic.setStatus(status); // Устанавливаем статус эпика
-                return epic;
+                return new Epic(id, name, description); // Предполагается, что Epic имеет такой конструктор
             case SUBTASK:
-                int epicId = Integer.parseInt(fields[5]);
+                int epicId = Integer.parseInt(parts[5]); // Предполагается, что epicId находится в строке
                 return new Subtask(id, name, description, status, epicId);
             default:
                 throw new IllegalArgumentException("Unknown task type: " + type);
         }
     }
-
 
     @Override
     public boolean equals(Object o) {

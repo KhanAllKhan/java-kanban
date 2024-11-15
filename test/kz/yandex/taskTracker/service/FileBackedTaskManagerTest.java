@@ -114,4 +114,5 @@ class FileBackedTaskManagerTest {
         assertEquals(expected.getStatus(), actual.getStatus());
         assertEquals(expected.getEpicId(), actual.getEpicId());
     }
+
 }
