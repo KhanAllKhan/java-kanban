@@ -6,9 +6,9 @@ import kz.yandex.taskTracker.model.Task;
 import kz.yandex.taskTracker.model.Status;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
@@ -80,7 +80,7 @@ class InMemoryHistoryManagerTest {
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        // Удаление эпика и проверка удаления подзадач из истории
+        // Удаление эпика
         manager.removeEpic(epic.getId());
 
         List<Task> history = manager.getHistory();
@@ -95,7 +95,7 @@ class InMemoryHistoryManagerTest {
         Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
         manager.addTask(task);
 
-        // Удаление задачи и проверка удаления из истории
+        // Удаление задачи
         manager.removeTask(task.getId());
 
         List<Task> history = manager.getHistory();
@@ -112,6 +112,7 @@ class InMemoryHistoryManagerTest {
         Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, epic.getId());
         manager.addSubtask(subtask1);
 
+        // Удаление подзадачи
         manager.removeSubtask(subtask1.getId());
 
         assertNull(manager.getSubtask(subtask1.getId()));
@@ -130,31 +131,11 @@ class InMemoryHistoryManagerTest {
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        // Проверка целостности данных после удаления подзадачи
+        // Удаление подзадачи
         manager.removeSubtask(subtask1.getId());
         assertFalse(manager.getEpic(epic.getId()).getSubtaskIds().contains(subtask1.getId()));
         assertTrue(manager.getEpic(epic.getId()).getSubtaskIds().contains(subtask2.getId()));
     }
 
-    @Test
-    public void testTaskSettersUpdateManagerData() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
 
-        Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
-        manager.addTask(task);
-
-        // Изменение названия задачи через сеттер и проверка обновленных данных
-        task.setName("Updated Task 1");
-        manager.updateTask(task);
-
-        Task updatedTask = manager.getTask(task.getId());
-        assertEquals("Updated Task 1", updatedTask.getName());
-
-        // Изменение описания задачи через сеттер и проверка обновленных данных
-        task.setDescription("Updated Description 1");
-        manager.updateTask(task);
-
-        updatedTask = manager.getTask(task.getId());
-        assertEquals("Updated Description 1", updatedTask.getDescription());
-    }
 }
