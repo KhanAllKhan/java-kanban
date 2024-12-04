@@ -11,8 +11,8 @@ public class Task {
     private String name;
     private String description;
     private Status status;
-     static Duration duration;
-     static LocalDateTime startTime;
+    static Duration duration;
+    static LocalDateTime startTime;
 
     public Task(int id, String name, String description, Status status, Duration duration, LocalDateTime startTime) {
         this.id = id;

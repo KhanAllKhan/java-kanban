@@ -3,6 +3,7 @@ package kz.yandex.taskTracker.service;
 import kz.yandex.taskTracker.model.Epic;
 import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Task;
+
 import java.util.List;
 
 public interface TaskManager {
@@ -45,6 +46,7 @@ public interface TaskManager {
     List<Subtask> getEpicSubtasks(int epicId);
 
     List<Task> getHistory();
+
     List<Task> getPrioritizedTasks();
 
 }
