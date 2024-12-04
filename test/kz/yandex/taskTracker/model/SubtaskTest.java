@@ -15,6 +15,6 @@ public class SubtaskTest {
             subtask.setEpicId(1);
         });
 
-        assertEquals("Подзадача не может быть своим собственным эпопиком", exception.getMessage());
+        assertEquals("Подзадача не может быть своим собственным эпиком", exception.getMessage());
     }
 }

@@ -19,6 +19,9 @@ public class Subtask extends Task {
     }
 
     public void setEpicId(int epicId) {
+        if (this.getId() == epicId) {
+            throw new IllegalArgumentException("Подзадача не может быть своим собственным эпиком");
+        }
         this.epicId = epicId;
     }
 
