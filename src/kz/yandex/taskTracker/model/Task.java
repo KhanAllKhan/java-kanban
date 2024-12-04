@@ -2,6 +2,8 @@ package kz.yandex.taskTracker.model;
 
 import kz.yandex.taskTracker.service.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -9,13 +11,38 @@ public class Task {
     private String name;
     private String description;
     private Status status;
+     static Duration duration;
+     static LocalDateTime startTime;
 
-    public Task(int id, String name, String description, Status status) {
+    public Task(int id, String name, String description, Status status, Duration duration, LocalDateTime startTime) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
     }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
 
     public int getId() {
         return id;
@@ -56,19 +83,22 @@ public class Task {
         String name = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        Duration duration = Duration.ofMinutes(Long.parseLong(parts[5]));
+        LocalDateTime startTime = LocalDateTime.parse(parts[6]);
 
         switch (type) {
             case TASK:
-                return new Task(id, name, description, status);
+                return new Task(id, name, description, status, duration, startTime);
             case EPIC:
-                return new Epic(id, name, description); // Предполагается, что Epic имеет такой конструктор
+                return new Epic(id, name, description); // Используем конструктор Epic без параметров duration и startTime
             case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]); // Предполагается, что epicId находится в строке
-                return new Subtask(id, name, description, status, epicId);
+                int epicId = Integer.parseInt(parts[7]);
+                return new Subtask(id, name, description, status, duration, startTime, epicId);
             default:
                 throw new IllegalArgumentException("Unknown task type: " + type);
         }
     }
+
 
     @Override
     public boolean equals(Object o) {

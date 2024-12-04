@@ -2,13 +2,15 @@ package kz.yandex.taskTracker.model;
 
 import kz.yandex.taskTracker.service.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
     private int epicId;
 
-    public Subtask(int id, String name, String description, Status status, int epicId) {
-        super(id, name, description, status);
+    public Subtask(int id, String name, String description, Status status, Duration duration, LocalDateTime startTime, int epicId) {
+        super(id, name, description, status, duration, startTime);
         this.epicId = epicId;
     }
 
@@ -17,9 +19,6 @@ public class Subtask extends Task {
     }
 
     public void setEpicId(int epicId) {
-        if (this.getId() == epicId) {
-            throw new IllegalArgumentException("Подзадача не может быть своим собственным эпопиком");
-        }
         this.epicId = epicId;
     }
 
@@ -44,6 +43,6 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription() + "," + epicId;
+        return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription() + "," + getDuration().toMinutes() + "," + getStartTime() + "," + epicId;
     }
 }

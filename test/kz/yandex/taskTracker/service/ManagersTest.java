@@ -9,11 +9,13 @@ public class ManagersTest {
     public void testGetDefaultTaskManager() {
         TaskManager taskManager = Managers.getDefault();
         assertNotNull(taskManager);
+        assertTrue(taskManager instanceof InMemoryTaskManager);
     }
 
     @Test
     public void testGetDefaultHistoryManager() {
         HistoryManager historyManager = Managers.getDefaultHistory();
         assertNotNull(historyManager);
+        assertTrue(historyManager instanceof InMemoryHistoryManager);
     }
 }
