@@ -10,12 +10,10 @@ import java.util.Objects;
 
 public class Epic extends Task {
     private final List<Integer> subtaskIds = new ArrayList<>();
-    private Duration duration;
     private LocalDateTime endTime;
 
     public Epic(int id, String name, String description) {
         super(id, name, description, Status.NEW, Duration.ZERO, LocalDateTime.now());
-        this.duration = Duration.ZERO;
     }
 
     public List<Integer> getSubtaskIds() {
@@ -35,7 +33,7 @@ public class Epic extends Task {
 
     @Override
     public Duration getDuration() {
-        return duration;
+        return super.getDuration();
     }
 
     @Override
@@ -43,37 +41,41 @@ public class Epic extends Task {
         return endTime;
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     public TaskType getType() {
         return TaskType.EPIC;
     }
 
-    public void calculateFields(List<Subtask> subtasks) {
-        duration = Duration.ZERO;
-        LocalDateTime startTime = null;
-        LocalDateTime endTime = null;
+    public void updateStatus(List<Subtask> subtasks) {
+        if (subtasks.isEmpty()) {
+            setStatus(Status.NEW);
+            return;
+        }
+
+        boolean allNew = true;
+        boolean allDone = true;
 
         for (Subtask subtask : subtasks) {
-            if (subtask != null) {
-                if (subtask.getStartTime() != null && subtask.getDuration() != null) {
-                    duration = duration.plus(subtask.getDuration());
-                    if (startTime == null || subtask.getStartTime().isBefore(startTime)) {
-                        startTime = subtask.getStartTime();
-                    }
-                    LocalDateTime subtaskEndTime = subtask.getStartTime().plus(subtask.getDuration());
-                    if (endTime == null || subtaskEndTime.isAfter(endTime)) {
-                        endTime = subtaskEndTime;
-                    }
-                }
+            if (subtask.getStatus() != Status.NEW) {
+                allNew = false;
+            }
+            if (subtask.getStatus() != Status.DONE) {
+                allDone = false;
             }
         }
-        this.endTime = endTime;
 
-        System.out.println("Calculated duration: " + duration);
-        System.out.println("Calculated startTime: " + startTime);
-        System.out.println("Calculated endTime: " + endTime);
+        if (allNew) {
+            setStatus(Status.NEW);
+        } else if (allDone) {
+            setStatus(Status.DONE);
+        } else {
+            setStatus(Status.IN_PROGRESS);
+        }
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -82,14 +84,14 @@ public class Epic extends Task {
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
         return Objects.equals(subtaskIds, epic.subtaskIds) &&
-                Objects.equals(duration, epic.duration) &&
-                Objects.equals(startTime, epic.startTime) &&
+                Objects.equals(getDuration(), epic.getDuration()) &&
+                Objects.equals(getStartTime(), epic.getStartTime()) &&
                 Objects.equals(endTime, epic.endTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subtaskIds, duration, startTime, endTime);
+        return Objects.hash(super.hashCode(), subtaskIds, getDuration(), getStartTime(), endTime);
     }
 
     @Override

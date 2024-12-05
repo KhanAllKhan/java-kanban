@@ -47,7 +47,6 @@ class FileBackedTaskManagerTest {
         assertTrue(loadedManager.getSubtasks().isEmpty());
     }
 
-
     @Test
     void testFileCreationAndDeletion() throws IOException {
         // Проверяем, что временный файл создан
@@ -58,6 +57,42 @@ class FileBackedTaskManagerTest {
 
         // Проверяем, что файл удален
         assertFalse(tempFile.exists());
+    }
+
+
+    @Test
+    void testSaveAndLoadEpics() {
+        Epic epic1 = new Epic(1, "Epic 1", "Description 1");
+        Epic epic2 = new Epic(2, "Epic 2", "Description 2");
+        manager.addEpic(epic1);
+        manager.addEpic(epic2);
+
+        manager.save();
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        List<Epic> epics = loadedManager.getEpics();
+        assertEquals(2, epics.size());
+        assertEpicEquals(epic1, epics.get(0));
+        assertEpicEquals(epic2, epics.get(1));
+    }
+
+    @Test
+    void testSaveAndLoadSubtasks() {
+        Epic epic = new Epic(1, "Epic 1", "Description 1");
+        manager.addEpic(epic);
+
+        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, Duration.ofMinutes(60), LocalDateTime.of(2023, 1, 1, 9, 0), epic.getId());
+        Subtask subtask2 = new Subtask(3, "Subtask 2", "Description 2", Status.IN_PROGRESS, Duration.ofMinutes(120), LocalDateTime.of(2023, 1, 1, 10, 0), epic.getId());
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+
+        manager.save();
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        List<Subtask> subtasks = loadedManager.getSubtasks();
+        assertEquals(2, subtasks.size());
+        assertSubtaskEquals(subtask1, subtasks.get(0));
+        assertSubtaskEquals(subtask2, subtasks.get(1));
     }
 
     private void assertTaskEquals(Task expected, Task actual) {

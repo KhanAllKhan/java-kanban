@@ -11,8 +11,8 @@ public class Task {
     private String name;
     private String description;
     private Status status;
-    static Duration duration;
-    static LocalDateTime startTime;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public Task(int id, String name, String description, Status status, Duration duration, LocalDateTime startTime) {
         this.id = id;
@@ -43,7 +43,6 @@ public class Task {
         return startTime.plus(duration);
     }
 
-
     public int getId() {
         return id;
     }
@@ -62,6 +61,10 @@ public class Task {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Status getStatus() {
@@ -99,16 +102,12 @@ public class Task {
         }
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id &&
-                Objects.equals(name, task.name) &&
-                Objects.equals(description, task.description) &&
-                status == task.status;
+        return id == task.id && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status;
     }
 
     @Override

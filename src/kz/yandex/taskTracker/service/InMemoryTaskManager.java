@@ -2,6 +2,7 @@ package kz.yandex.taskTracker.service;
 
 import kz.yandex.taskTracker.model.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class InMemoryTaskManager implements TaskManager {
         task.setId(generateId());
         tasks.put(task.getId(), task);
         prioritizedTasks.add(task);
-        historyManager.add(task); // Добавляем задачу в историю
+        historyManager.add(task);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         tasks.put(task.getId(), task);
         prioritizedTasks.add(task);
-        historyManager.add(task); // Обновляем историю
+        historyManager.add(task);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class InMemoryTaskManager implements TaskManager {
         Task task = tasks.remove(id);
         if (task != null) {
             prioritizedTasks.remove(task);
-            historyManager.remove(id); // Удаляем из истории
+            historyManager.remove(id);
         }
     }
 
@@ -87,7 +88,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllTasks() {
         List<Integer> taskIds = new ArrayList<>(tasks.keySet());
         for (Integer id : taskIds) {
-            removeTask(id); // Удаляем каждую задачу и из historyManager
+            removeTask(id);
         }
     }
 
@@ -102,9 +103,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             epic.addSubtask(subtask.getId());
             updateEpicStatus(epic);
+            calculateFields(epic, getEpicSubtasks(epic.getId()));
         }
         prioritizedTasks.add(subtask);
-        historyManager.add(subtask); // Добавляем подзадачу в историю
+        historyManager.add(subtask);
     }
 
     @Override
@@ -125,9 +127,10 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(subtask.getEpicId());
         if (epic != null) {
             updateEpicStatus(epic);
+            calculateFields(epic, getEpicSubtasks(epic.getId()));
         }
         prioritizedTasks.add(subtask);
-        historyManager.add(subtask); // Обновляем историю
+        historyManager.add(subtask);
     }
 
     @Override
@@ -139,8 +142,9 @@ public class InMemoryTaskManager implements TaskManager {
             if (epic != null) {
                 epic.removeSubtask(subtask.getId());
                 updateEpicStatus(epic);
+                calculateFields(epic, getEpicSubtasks(epic.getId()));
             }
-            historyManager.remove(id); // Удаляем из истории
+            historyManager.remove(id);
         }
     }
 
@@ -148,11 +152,12 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllSubtasks() {
         List<Integer> subtaskIds = new ArrayList<>(subtasks.keySet());
         for (Integer id : subtaskIds) {
-            removeSubtask(id); // Удаляем каждую подзадачу и из historyManager
+            removeSubtask(id);
         }
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
             updateEpicStatus(epic);
+            calculateFields(epic, new ArrayList<>());
         }
     }
 
@@ -160,7 +165,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void addEpic(Epic epic) {
         epic.setId(generateId());
         epics.put(epic.getId(), epic);
-        historyManager.add(epic); // Добавляем эпик в историю
+        historyManager.add(epic);
     }
 
     @Override
@@ -180,8 +185,8 @@ public class InMemoryTaskManager implements TaskManager {
             existingEpic.setStatus(epic.getStatus());
             existingEpic.setDuration(epic.getDuration());
             existingEpic.setStartTime(epic.getStartTime());
-            existingEpic.calculateFields(getEpicSubtasks(epic.getId()));
-            historyManager.add(existingEpic); // Обновляем историю
+            calculateFields(existingEpic, getEpicSubtasks(existingEpic.getId()));
+            historyManager.add(existingEpic);
         }
     }
 
@@ -191,10 +196,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             for (Integer subtaskId : epic.getSubtaskIds()) {
                 subtasks.remove(subtaskId);
-                historyManager.remove(subtaskId); // Удаляем подзадачу из истории
+                historyManager.remove(subtaskId);
             }
             prioritizedTasks.remove(epic);
-            historyManager.remove(id); // Удаляем эпик из истории
+            historyManager.remove(id);
         }
     }
 
@@ -202,9 +207,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllEpics() {
         List<Integer> epicIds = new ArrayList<>(epics.keySet());
         for (Integer id : epicIds) {
-            removeEpic(id); // Удаляем каждый эпик и из historyManager
+            removeEpic(id);
         }
-        subtasks.clear(); // Убираем все подзадачи, так как они тоже связаны с эпиками
+        subtasks.clear();
     }
 
     @Override
@@ -224,12 +229,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Subtask> getEpicSubtasks(int epicId) {
-        Epic epic = epics.get(epicId);
-        if (epic == null) {
-            return new ArrayList<>();
-        }
-
-        return epic.getSubtaskIds().stream()
+        return Optional.ofNullable(epics.get(epicId))
+                .map(Epic::getSubtaskIds)
+                .orElse(List.of())
+                .stream()
                 .map(subtasks::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -242,7 +245,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) {
-            epic.setStatus(Status.NEW); // Убедитесь, что этот метод есть в Task
+            epic.setStatus(Status.NEW);
             return;
         }
 
@@ -262,15 +265,51 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (allNew) {
-            epic.setStatus(Status.NEW); // Убедитесь, что этот метод есть в Task
+            epic.setStatus(Status.NEW);
         } else if (allDone) {
-            epic.setStatus(Status.DONE); // Убедитесь, что этот метод есть в Task
+            epic.setStatus(Status.DONE);
         } else {
-            epic.setStatus(Status.IN_PROGRESS); // Убедитесь, что этот метод есть в Task
+            epic.setStatus(Status.IN_PROGRESS);
         }
     }
 
-    // Новые методы для доступа к idCounter
+    // Метод для расчета полей эпика
+    protected void calculateFields(Epic epic, List<Subtask> subtasks) {
+        Duration totalDuration = Duration.ZERO;
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+
+        for (Subtask subtask : subtasks) {
+            if (subtask != null) {
+                Duration subtaskDuration = subtask.getDuration();
+                LocalDateTime subtaskStartTime = subtask.getStartTime();
+
+                if (subtaskStartTime != null && subtaskDuration != null) {
+                    totalDuration = totalDuration.plus(subtaskDuration);
+
+                    if (startTime == null || subtaskStartTime.isBefore(startTime)) {
+                        startTime = subtaskStartTime;
+                    }
+
+                    LocalDateTime subtaskEndTime = subtaskStartTime.plus(subtaskDuration);
+
+                    if (endTime == null || subtaskEndTime.isAfter(endTime)) {
+                        endTime = subtaskEndTime;
+                    }
+                }
+            }
+        }
+
+        epic.setStartTime(startTime);
+        epic.setDuration(totalDuration);
+        epic.setEndTime(endTime);
+
+        System.out.println("Calculated total duration: " + totalDuration);
+        System.out.println("Calculated startTime: " + startTime);
+        System.out.println("Calculated endTime: " + endTime);
+    }
+
+    // New methods for accessing idCounter
     protected int getIdCounter() {
         return idCounter;
     }
@@ -279,4 +318,3 @@ public class InMemoryTaskManager implements TaskManager {
         this.idCounter = idCounter;
     }
 }
-
