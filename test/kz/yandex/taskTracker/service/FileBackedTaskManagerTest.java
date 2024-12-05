@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,42 +48,6 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void testSaveAndLoadMultipleTasks() {
-        // Создаем и добавляем несколько задач
-        Task task1 = new Task(1, "Переезд", "Собрать вещи", Status.NEW);
-        Task task2 = new Task(2, "Собрать коробки", "Упаковать вещи", Status.NEW);
-        Epic epic1 = new Epic(3, "Эпик", "Описание эпика");
-        Subtask subtask1 = new Subtask(4, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic1.getId());
-
-        manager.addTask(task1);
-        manager.addTask(task2);
-        manager.addEpic(epic1);
-        manager.addSubtask(subtask1);
-
-        // Сохраняем менеджер
-        manager.save();
-
-        // Загружаем данные из того же файла
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-
-        // Проверяем, что загруженные данные совпадают с сохраненными
-        List<Task> loadedTasks = loadedManager.getTasks();
-        List<Epic> loadedEpics = loadedManager.getEpics();
-        List<Subtask> loadedSubtasks = loadedManager.getSubtasks();
-
-        assertEquals(2, loadedTasks.size());
-        assertEquals(1, loadedEpics.size());
-        assertEquals(1, loadedSubtasks.size());
-
-        // Сравниваем поля задач
-        assertTaskEquals(task1, loadedTasks.get(0));
-        assertTaskEquals(task2, loadedTasks.get(1));
-        assertEpicEquals(epic1, loadedEpics.get(0));
-        assertSubtaskEquals(subtask1, loadedSubtasks.get(0));
-    }
-
-
-    @Test
     void testFileCreationAndDeletion() throws IOException {
         // Проверяем, что временный файл создан
         assertTrue(tempFile.exists());
@@ -93,11 +59,49 @@ class FileBackedTaskManagerTest {
         assertFalse(tempFile.exists());
     }
 
+
+    @Test
+    void testSaveAndLoadEpics() {
+        Epic epic1 = new Epic(1, "Epic 1", "Description 1");
+        Epic epic2 = new Epic(2, "Epic 2", "Description 2");
+        manager.addEpic(epic1);
+        manager.addEpic(epic2);
+
+        manager.save();
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        List<Epic> epics = loadedManager.getEpics();
+        assertEquals(2, epics.size());
+        assertEpicEquals(epic1, epics.get(0));
+        assertEpicEquals(epic2, epics.get(1));
+    }
+
+    @Test
+    void testSaveAndLoadSubtasks() {
+        Epic epic = new Epic(1, "Epic 1", "Description 1");
+        manager.addEpic(epic);
+
+        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, Duration.ofMinutes(60), LocalDateTime.of(2023, 1, 1, 9, 0), epic.getId());
+        Subtask subtask2 = new Subtask(3, "Subtask 2", "Description 2", Status.IN_PROGRESS, Duration.ofMinutes(120), LocalDateTime.of(2023, 1, 1, 10, 0), epic.getId());
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+
+        manager.save();
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        List<Subtask> subtasks = loadedManager.getSubtasks();
+        assertEquals(2, subtasks.size());
+        assertSubtaskEquals(subtask1, subtasks.get(0));
+        assertSubtaskEquals(subtask2, subtasks.get(1));
+    }
+
     private void assertTaskEquals(Task expected, Task actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.getDuration(), actual.getDuration());
+        assertEquals(expected.getStartTime(), actual.getStartTime());
     }
 
     private void assertEpicEquals(Epic expected, Epic actual) {
@@ -113,6 +117,7 @@ class FileBackedTaskManagerTest {
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getStatus(), actual.getStatus());
         assertEquals(expected.getEpicId(), actual.getEpicId());
+        assertEquals(expected.getDuration(), actual.getDuration());
+        assertEquals(expected.getStartTime(), actual.getStartTime());
     }
-
 }

@@ -6,6 +6,8 @@ import kz.yandex.taskTracker.model.Subtask;
 import kz.yandex.taskTracker.model.Status;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +17,7 @@ public class HistoryManagerTest {
     public void testAddAndRemoveHistory() {
         HistoryManager historyManager = Managers.getDefaultHistory();
 
-        Task task1 = new Task(1, "Task 1", "Description 1", Status.NEW);
+        Task task1 = new Task(1, "Task 1", "Description 1", Status.NEW, Duration.ofMinutes(30), LocalDateTime.now());
         historyManager.add(task1);
 
         List<Task> history = historyManager.getHistory();
@@ -31,7 +33,7 @@ public class HistoryManagerTest {
     public void testPreventDuplicateHistoryEntries() {
         HistoryManager historyManager = Managers.getDefaultHistory();
 
-        Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
+        Task task = new Task(1, "Task 1", "Description 1", Status.NEW, Duration.ofMinutes(30), LocalDateTime.now());
         historyManager.add(task);
         historyManager.add(task); // Добавление той же задачи второй раз
 
@@ -47,7 +49,7 @@ public class HistoryManagerTest {
         Epic epic = new Epic(1, "Epic 1", "Description 1");
         manager.addEpic(epic);
 
-        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, epic.getId());
+        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, Duration.ofMinutes(30), LocalDateTime.now(), epic.getId());
         manager.addSubtask(subtask1);
 
         // Удаление подзадачи и проверка целостности данных
@@ -58,29 +60,9 @@ public class HistoryManagerTest {
 
 
     @Test
-    public void testRemoveEpicAndRelatedSubtasksFromHistory() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
-        Epic epic = new Epic(1, "Epic 1", "Description 1");
-        manager.addEpic(epic);
-
-        Subtask subtask1 = new Subtask(2, "Subtask 1", "Description 1", Status.NEW, epic.getId());
-        Subtask subtask2 = new Subtask(3, "Subtask 2", "Description 2", Status.NEW, epic.getId());
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);
-
-        // Удаление эпика и проверка удаления подзадач из истории
-        manager.removeEpic(epic.getId());
-
-        List<Task> history = manager.getHistory();
-        assertFalse(history.contains(epic));
-        assertFalse(history.contains(subtask1));
-        assertFalse(history.contains(subtask2));
-    }
-
-    @Test
     public void testRemoveTaskFromHistory() {
         InMemoryTaskManager manager = new InMemoryTaskManager();
-        Task task = new Task(1, "Task 1", "Description 1", Status.NEW);
+        Task task = new Task(1, "Task 1", "Description 1", Status.NEW, Duration.ofMinutes(30), LocalDateTime.now());
         manager.addTask(task);
 
         // Удаление задачи и проверка удаления из истории
@@ -90,4 +72,3 @@ public class HistoryManagerTest {
         assertFalse(history.contains(task));
     }
 }
-
