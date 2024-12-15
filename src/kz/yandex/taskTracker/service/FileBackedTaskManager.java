@@ -3,9 +3,12 @@ package kz.yandex.taskTracker.service;
 import kz.yandex.taskTracker.model.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private static final String HEADER = "id,type,name,status,description,epic\n";
+    private static final String HEADER = "id,type,name,status,description,duration,startTime,endTime,epic\n";
     private final File file;
 
     public FileBackedTaskManager(File file) {
@@ -29,6 +32,41 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+    public void calculateFields(Epic epic, List<Subtask> subtasks) {
+        Duration totalDuration = Duration.ZERO;
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+
+        for (Subtask subtask : subtasks) {
+            if (subtask != null) {
+                Duration subtaskDuration = subtask.getDuration();
+                LocalDateTime subtaskStartTime = subtask.getStartTime();
+
+                if (subtaskStartTime != null && subtaskDuration != null) {
+                    totalDuration = totalDuration.plus(subtaskDuration);
+
+                    if (startTime == null || subtaskStartTime.isBefore(startTime)) {
+                        startTime = subtaskStartTime;
+                    }
+
+                    LocalDateTime subtaskEndTime = subtaskStartTime.plus(subtaskDuration);
+
+                    if (endTime == null || subtaskEndTime.isAfter(endTime)) {
+                        endTime = subtaskEndTime;
+                    }
+                }
+            }
+        }
+
+        epic.setStartTime(startTime);
+        epic.setDuration(totalDuration);
+        epic.setEndTime(endTime);
+
+        System.out.println("Calculated total duration: " + totalDuration);
+        System.out.println("Calculated startTime: " + startTime);
+        System.out.println("Calculated endTime: " + endTime);
+    }
+
     @Override
     public void addTask(Task task) {
         super.addTask(task);
@@ -43,8 +81,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask); // Вызов метода родителя для добавления подзадачи
-        save(); // Сохраняем изменения
+        super.addSubtask(subtask);
+        save();
     }
 
     @Override
@@ -67,7 +105,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void removeTask(int id) {
-        tasks.remove(id);
+        super.removeTask(id);
         save();
     }
 
@@ -123,6 +161,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     epic.addSubtask(subtaskId);
                 }
             }
+            // Рассчитываем поля duration и startTime для эпиков
+            calculateFields(epic, getEpicSubtasks(epic.getId()));
         }
     }
 
