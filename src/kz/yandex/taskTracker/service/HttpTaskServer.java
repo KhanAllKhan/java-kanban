@@ -186,6 +186,7 @@ public class HttpTaskServer {
         }
     }
 }
+
 class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
@@ -199,6 +200,7 @@ class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
         return LocalDateTime.parse(jsonReader.nextString(), formatter);
     }
 }
+
 class DurationAdapter extends TypeAdapter<Duration> {
     @Override
     public void write(JsonWriter jsonWriter, Duration duration) throws IOException {
