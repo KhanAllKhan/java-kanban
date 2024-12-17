@@ -1,8 +1,3 @@
-id,type,name,status,description,epic
-1,TASK,Обычная задача,DONE,Описание обычной задачи
-2,TASK,Эпик задача,IN_PROGRESS,Описание эпика
-3,TASK,Подзадача 1,NEW,Описание подзадачи 1
-4,TASK,Обычная задача,DONE,Описание обычной задачи
-5,TASK,Обычная задача,DONE,Описание обычной задачи
-12,TASK,Обычная задача,DONE,Описание обычной задачи
-
+id,type,name,status,description,duration,startTime,endTime,epic
+1,TASK,Task 1,NEW,Description 1
+2,TASK,Task 2,NEW,Description 2
